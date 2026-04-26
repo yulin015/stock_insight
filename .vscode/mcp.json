@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "sec-fetcher": {
+      "command": "/opt/homebrew/bin/node",
+      "args": ["/Users/yulinchen/Workstation/stock_insight_git/mcp/sec-fetcher.js"]
+    }
+  }
+}

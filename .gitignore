@@ -1,0 +1,21 @@
+# Node dependencies
+node_modules/
+npm-debug.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+
+# Project specific
+tmp/
+repository/csv/
+repository/13f/CIK_*/202*.*
+
+# IDE settings
+.gemini/
+.DS_Store
