@@ -1,7 +1,115 @@
 import yfinance as yf
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
+import json
+
+
+
+def download_stock_history(stock_ticker: str, start_date: pd.Timestamp, end_date: pd.Timestamp, end_date_str: str, csv_file: str, is_current: bool) -> bool:
+    """
+    Checks if local database is up-to-date, downloads historical stock data from yfinance if needed, 
+    and saves it to a local CSV database.
+    
+    Args:
+        stock_ticker (str): The stock ticker symbol.
+        start_date (pd.Timestamp): The start date for the download.
+        end_date (pd.Timestamp): The end date for the download.
+        end_date_str (str): String representation of the end date for logging.
+        csv_file (str): Path to the CSV file to save the data.
+        is_current (bool): Whether the requested period ends at the current time.
+        
+    Returns:
+        bool: True if database is up-to-date or download was successful, False otherwise.
+    """
+    needs_update = True
+    today = datetime.now()
+    
+    if os.path.exists(csv_file):
+        print(f"Found existing database: {csv_file}")
+        try:
+            # Read existing data (skip first 3 rows as per existing code pattern)
+            existing_data = pd.read_csv(csv_file, skiprows=3, names=['Date', 'Close', 'High', 'Low', 'Open', 'Volume'])
+            existing_data['Date'] = pd.to_datetime(existing_data['Date'], utc=True)
+            # Convert to timezone-naive for comparison
+            if existing_data['Date'].dt.tz is not None:
+                existing_data['Date'] = existing_data['Date'].dt.tz_localize(None)
+            
+            if not existing_data.empty:
+                last_date_in_db = existing_data['Date'].max()
+                first_date_in_db = existing_data['Date'].min()
+                
+                print(f"Database date range: {first_date_in_db.strftime('%Y-%m-%d')} to {last_date_in_db.strftime('%Y-%m-%d')}")
+                
+                # Check if database covers the required period
+                if is_current:
+                    # For current queries, update if data is older than today
+                    if last_date_in_db.date() >= today.date():
+                        needs_update = False
+                        print("Database is up-to-date for current query.")
+                    else:
+                        print("Checking if newer trading days are available...")
+                        try:
+                            check_data = yf.Ticker(stock_ticker).history(period="5d")
+                            if not check_data.empty:
+                                latest_available = check_data.index.max().tz_localize(None).date()
+                                if latest_available <= last_date_in_db.date():
+                                    needs_update = False
+                                    print(f"Database is up-to-date (no newer trading days available).")
+                                else:
+                                    print(f"Database is outdated (last date: {last_date_in_db.strftime('%Y-%m-%d')}, available: {latest_available}). Will update.")
+                            else:
+                                needs_update = False
+                        except Exception:
+                            print(f"Database might be outdated (last date: {last_date_in_db.strftime('%Y-%m-%d')}). Will update.")
+                else:
+                    # For historical queries, check if we have data up to end_date
+                    if last_date_in_db.date() >= end_date.date() and first_date_in_db.date() <= start_date.date():
+                        needs_update = False
+                        print("Database covers the requested historical period.")
+                    else:
+                        print(f"Database doesn't cover the full period. Will update.")
+            else:
+                print("Database file is empty. Will download fresh data.")
+        except Exception as e:
+            print(f"Error reading existing database: {e}. Will download fresh data.")
+            needs_update = True
+    else:
+        print(f"No existing database found for {stock_ticker}. Will download data.")
+        
+    if not needs_update:
+        return True
+
+    try:
+        stock = yf.Ticker(stock_ticker)
+        # Download from a bit before start_date to ensure complete data
+        download_start = (start_date - pd.Timedelta(days=5)).strftime('%Y-%m-%d')
+        
+        # yfinance 'end' is exclusive, so we add 1 day to ensure end_date is included
+        download_end = (end_date + pd.Timedelta(days=1)).strftime('%Y-%m-%d')
+        print(f"Downloading data for {stock_ticker} from {download_start} to {end_date_str}...")
+        
+        historical_data = stock.history(start=download_start, end=download_end, auto_adjust=True)
+        
+        if historical_data.empty:
+            print(f"Error: No historical data found for {stock_ticker} in the specified period.")
+            return False
+        
+        # Save to CSV file matching the existing repository format
+        # Format: 3 header rows, then data with Date,Close,High,Low,Open,Volume
+        with open(csv_file, 'w') as f:
+            # Write the 3-row header
+            f.write('Price,Close,High,Low,Open,Volume\n')
+            f.write(f'Ticker,{stock_ticker},{stock_ticker},{stock_ticker},{stock_ticker},{stock_ticker}\n')
+            f.write('Date,,,,,\n')
+        
+        # Append the data
+        historical_data[['Close', 'High', 'Low', 'Open', 'Volume']].to_csv(csv_file, mode='a', header=False)
+        print(f"Database saved/updated: {csv_file}")
+        return True
+    except Exception as e:
+        print(f"Error downloading data for {stock_ticker}: {e}")
+        return False
 
 
 def stock_drop_percentage(stock_ticker: str, start_time: str, end_time: str) -> float:
@@ -54,7 +162,7 @@ def stock_drop_percentage(stock_ticker: str, start_time: str, end_time: str) -> 
     
     try:
         # Setup local database path
-        repository_dir = "repository"
+        repository_dir = os.path.join("repository", "csv")
         os.makedirs(repository_dir, exist_ok=True)
         csv_file = os.path.join(repository_dir, f"{stock_ticker}.csv")
         
@@ -76,72 +184,10 @@ def stock_drop_percentage(stock_ticker: str, start_time: str, end_time: str) -> 
             print(f"Error: End time ({end_date_str}) cannot be before start time ({start_time}).")
             return 0.0
         
-        # Check if local database exists and is up-to-date
-        needs_update = True
-        
-        if os.path.exists(csv_file):
-            print(f"Found existing database: {csv_file}")
-            try:
-                # Read existing data (skip first 3 rows as per existing code pattern)
-                existing_data = pd.read_csv(csv_file, skiprows=3, names=['Date', 'Close', 'High', 'Low', 'Open', 'Volume'])
-                existing_data['Date'] = pd.to_datetime(existing_data['Date'], utc=True)
-                # Convert to timezone-naive for comparison
-                if existing_data['Date'].dt.tz is not None:
-                    existing_data['Date'] = existing_data['Date'].dt.tz_localize(None)
-                
-                if not existing_data.empty:
-                    last_date_in_db = existing_data['Date'].max()
-                    first_date_in_db = existing_data['Date'].min()
-                    
-                    print(f"Database date range: {first_date_in_db.strftime('%Y-%m-%d')} to {last_date_in_db.strftime('%Y-%m-%d')}")
-                    
-                    # Check if database covers the required period
-                    if is_current:
-                        # For current queries, update if data is older than today
-                        if last_date_in_db.date() >= today.date():
-                            needs_update = False
-                            print("Database is up-to-date for current query.")
-                        else:
-                            print(f"Database is outdated (last date: {last_date_in_db.strftime('%Y-%m-%d')}). Will update.")
-                    else:
-                        # For historical queries, check if we have data up to end_date
-                        if last_date_in_db.date() >= end_date.date() and first_date_in_db.date() <= start_date.date():
-                            needs_update = False
-                            print("Database covers the requested historical period.")
-                        else:
-                            print(f"Database doesn't cover the full period. Will update.")
-                else:
-                    print("Database file is empty. Will download fresh data.")
-            except Exception as e:
-                print(f"Error reading existing database: {e}. Will download fresh data.")
-                needs_update = True
-        else:
-            print(f"No existing database found for {stock_ticker}. Will download data.")
-        
-        # Update/download database if needed
-        if needs_update:
-            stock = yf.Ticker(stock_ticker)
-            # Download from a bit before start_date to ensure complete data
-            download_start = (start_date - pd.Timedelta(days=5)).strftime('%Y-%m-%d')
-            print(f"Downloading data for {stock_ticker} from {download_start} to {end_date_str}...")
-            
-            historical_data = stock.history(start=download_start, end=end_date_str, auto_adjust=True)
-            
-            if historical_data.empty:
-                print(f"Error: No historical data found for {stock_ticker} in the specified period.")
-                return 0.0
-            
-            # Save to CSV file matching the existing repository format
-            # Format: 3 header rows, then data with Date,Close,High,Low,Open,Volume
-            with open(csv_file, 'w') as f:
-                # Write the 3-row header
-                f.write('Price,Close,High,Low,Open,Volume\n')
-                f.write(f'Ticker,{stock_ticker},{stock_ticker},{stock_ticker},{stock_ticker},{stock_ticker}\n')
-                f.write('Date,,,,,\n')
-            
-            # Append the data
-            historical_data[['Close', 'High', 'Low', 'Open', 'Volume']].to_csv(csv_file, mode='a', header=False)
-            print(f"Database saved/updated: {csv_file}")
+        # Check and update/download database if needed
+        success = download_stock_history(stock_ticker, start_date, end_date, end_date_str, csv_file, is_current)
+        if not success:
+            return 0.0
         
         # Load data from local database
         print(f"Loading data from {csv_file}...")
@@ -262,6 +308,285 @@ def _is_market_open(current_time: datetime) -> bool:
     return market_open_minutes <= current_minutes < market_close_minutes
 
 
+def stock_csv_to_json(stock_ticker: str) -> list:
+    """
+    Reads the local CSV database for a given ticker and returns a list of dictionaries.
+    Each dictionary contains the date, open, high, low, close, and change metrics.
+    All prices and metrics are formatted to 2 decimal places.
+    
+    Args:
+        stock_ticker (str): The stock ticker symbol.
+        
+    Returns:
+        list: A list of dictionaries containing the formatted daily data.
+    """
+    csv_file = os.path.join("repository", "csv", f"{stock_ticker}.csv")
+    if not os.path.exists(csv_file):
+        print(f"Error: CSV file not found for {stock_ticker}")
+        return []
+        
+    try:
+        # Read the CSV file, skipping the first 3 rows as per existing code pattern
+        df = pd.read_csv(csv_file, skiprows=3, names=['Date', 'Close', 'High', 'Low', 'Open', 'Volume'])
+        
+        # Sort values by Date to ensure chronological order
+        df['Date'] = pd.to_datetime(df['Date'], utc=True)
+        df = df.sort_values('Date')
+        
+        result = []
+        previous_alltime_highest = 0.0
+        
+        for _, row in df.iterrows():
+            date_str = row['Date'].strftime('%Y-%m-%d')
+            open_price = float(row['Open'])
+            high_price = float(row['High'])
+            low_price = float(row['Low'])
+            close_price = float(row['Close'])
+            volume = int(row['Volume'])
+            
+            # Calculate change1 = (close - open)/open
+            if open_price != 0:
+                change1 = (close_price - open_price) / open_price
+            else:
+                change1 = 0.0
+                
+            # Calculate change2 = (close - previous_alltime_highest)/previous_alltime_highest
+            if previous_alltime_highest == 0.0:
+                change2 = 0.0
+            else:
+                if close_price >= previous_alltime_highest:
+                    change2 = 0.0
+                else:
+                    change2 = (close_price - previous_alltime_highest) / previous_alltime_highest
+            
+            # Update previous_alltime_highest for the next iteration (using close price)
+            previous_alltime_highest = max(previous_alltime_highest, close_price)
+            
+            # Format prices to .2f float, and changes to .2f% string
+            entity = {
+                "date": date_str,
+                "open": round(open_price, 2),
+                "high": round(high_price, 2),
+                "low": round(low_price, 2),
+                "close": round(close_price, 2),
+                "volume": volume,
+                "change1": f"{change1 * 100:.2f}%",
+                "change2": f"{change2 * 100:.2f}%"
+            }
+            result.append(entity)
+            
+        json_dir = os.path.join("repository", "json")
+        os.makedirs(json_dir, exist_ok=True)
+        json_file = os.path.join(json_dir, f"{stock_ticker}.json")
+        with open(json_file, 'w') as f:
+            json.dump(result, f, indent=2)
+            
+        return result
+        
+    except Exception as e:
+        print(f"Error processing CSV to JSON for {stock_ticker}: {e}")
+        return []
+
+
+def stock_price_check(ticker: str, term: str) -> tuple[float, float, float, float, float, str, float]:
+    """
+    Analyzes the stock price drop relative to historical data over a specified term.
+    
+    Args:
+        ticker (str): The stock ticker symbol.
+        term (str): The time horizon for analysis ("short", "mid", "long").
+        
+    Returns:
+        tuple[float, float, float, float, float, str, float]: A tuple containing (close_index, buy_chance, current_drop, worst_drop, current_price, worst_drop_date, change_today).
+    """
+    json_file = os.path.join("repository", "json", f"{ticker}.json")
+    if not os.path.exists(json_file):
+        print(f"Error: JSON file not found for {ticker}. Please generate it first.")
+        return 0.0, 0.0, 0.0, 0.0, 0.0, "", 0.0
+        
+    with open(json_file, 'r') as f:
+        data = json.load(f)
+        
+    if not data:
+        print(f"Error: JSON file for {ticker} is empty.")
+        return 0.0, 0.0, 0.0, 0.0, 0.0, "", 0.0
+        
+    today = datetime.now()
+    if term == "short":
+        cutoff_date = today - timedelta(days=365)
+    elif term == "mid":
+        cutoff_date = today - timedelta(days=365 * 3)
+    elif term == "long":
+        cutoff_date = today - timedelta(days=365 * 5)
+    elif term == "longExt":
+        cutoff_date = today - timedelta(days=365 * 10)
+    else:
+        print("Warning: Invalid term specified. Defaulting to 'short' (1 year).")
+        cutoff_date = today - timedelta(days=365)
+        
+    cutoff_date_str = cutoff_date.strftime('%Y-%m-%d')
+    filtered_data = [x for x in data if x["date"] >= cutoff_date_str]
+    
+    if not filtered_data:
+        print(f"Error: No data available for {ticker} in the specified {term} term.")
+        return 0.0, 0.0, 0.0, 0.0, 0.0, "", 0.0
+        
+    # get ticker current price by yfinance lib
+    try:
+        stock = yf.Ticker(ticker)
+        hist = stock.history(period="1d")
+        if hist.empty:
+            print(f"Error: Could not fetch current price for {ticker}.")
+            return 0.0, 0.0, 0.0, 0.0, 0.0, "", 0.0
+        current_price = float(hist["Close"].iloc[-1])
+        open_price = float(hist["Open"].iloc[-1])
+        if open_price != 0:
+            change_today = ((current_price - open_price) / open_price) * 100
+        else:
+            change_today = 0.0
+    except Exception as e:
+        print(f"Error fetching current price for {ticker}: {e}")
+        return 0.0, 0.0, 0.0, 0.0, 0.0, "", 0.0
+        
+    # get max close price in data loaded from json as all_time_high
+    all_time_high = max([x["close"] for x in filtered_data])
+    
+    # calculate the percentage drop as current_drop
+    if all_time_high > 0:
+        current_drop = ((current_price - all_time_high) / all_time_high) * 100
+    else:
+        current_drop = 0.0
+        
+    # helper to parse percentage string to float
+    def parse_change(change_str):
+        return float(change_str.replace('%', ''))
+        
+    # find out the worst change2 in data loaded from json
+    worst_drop_entry = min(filtered_data, key=lambda x: parse_change(x["change2"]))
+    worst_drop = parse_change(worst_drop_entry["change2"])
+    worst_drop_date = worst_drop_entry["date"]
+    
+    # calculate close_index
+    if worst_drop == 0:
+        close_index = 0.0
+    else:
+        close_index = (worst_drop - current_drop) / worst_drop
+        
+    # check data and calculate how many days have change2 lower than current_drop
+    drop_days = sum(1 for x in filtered_data if parse_change(x["change2"]) < current_drop)
+    
+    # calculate buy_chance
+    total_days = len(filtered_data)
+    buy_chance = drop_days / total_days if total_days > 0 else 0.0
+    
+    return close_index, buy_chance, current_drop, worst_drop, current_price, worst_drop_date, change_today
+
+
+def stock_price_check_by_date(ticker: str, target_date_str: str, term: str) -> tuple[float, float, float, float, float, str, float]:
+    """
+    Analyzes the stock price drop relative to historical data over a specified term, 
+    up to a specific target date.
+    
+    Args:
+        ticker (str): The stock ticker symbol.
+        target_date_str (str): The target date in 'YYYY-MM-DD' format.
+        term (str): The time horizon for analysis ("short", "mid", "long").
+        
+    Returns:
+        tuple[float, float, float, float, float, str, float]: A tuple containing (close_index, buy_chance, current_drop, worst_drop, current_price, worst_drop_date, change_today).
+    """
+    json_file = os.path.join("repository", "json", f"{ticker}.json")
+    if not os.path.exists(json_file):
+        print(f"Error: JSON file not found for {ticker}. Please generate it first.")
+        return 0.0, 0.0, 0.0, 0.0, 0.0, "", 0.0
+        
+    with open(json_file, 'r') as f:
+        data = json.load(f)
+        
+    if not data:
+        print(f"Error: JSON file for {ticker} is empty.")
+        return 0.0, 0.0, 0.0, 0.0, 0.0, "", 0.0
+        
+    try:
+        target_date = datetime.strptime(target_date_str, '%Y-%m-%d')
+    except ValueError:
+        print(f"Error: Invalid date format '{target_date_str}'. Use 'YYYY-MM-DD'.")
+        return 0.0, 0.0, 0.0, 0.0, 0.0, "", 0.0
+        
+    if term == "short":
+        cutoff_date = target_date - timedelta(days=365)
+    elif term == "mid":
+        cutoff_date = target_date - timedelta(days=365 * 3)
+    elif term == "long":
+        cutoff_date = target_date - timedelta(days=365 * 5)
+    elif term == "longExt":
+        cutoff_date = target_date - timedelta(days=365 * 10)
+    else:
+        print("Warning: Invalid term specified. Defaulting to 'short' (1 year).")
+        cutoff_date = target_date - timedelta(days=365)
+        
+    cutoff_date_str = cutoff_date.strftime('%Y-%m-%d')
+    
+    # Filter data to the period: [cutoff_date_str, target_date_str]
+    filtered_data = [x for x in data if cutoff_date_str <= x["date"] <= target_date_str]
+    
+    if not filtered_data:
+        print(f"Error: No data available for {ticker} between {cutoff_date_str} and {target_date_str}.")
+        return 0.0, 0.0, 0.0, 0.0, 0.0, "", 0.0
+        
+    # Get current price from the target date's data
+    # Find the exact date or the closest previous date within the filtered data
+    target_day_data = None
+    for x in reversed(filtered_data):
+        if x["date"] <= target_date_str:
+            target_day_data = x
+            break
+            
+    if not target_day_data:
+        print(f"Error: Could not find trading data on or before {target_date_str}.")
+        return 0.0, 0.0, 0.0, 0.0, 0.0, "", 0.0
+        
+    current_price = target_day_data["close"]
+    target_open_price = target_day_data["open"]
+    if target_open_price != 0:
+        change_today = ((current_price - target_open_price) / target_open_price) * 100
+    else:
+        change_today = 0.0
+        
+    # get max close price in data loaded from json as all_time_high
+    all_time_high = max([x["close"] for x in filtered_data])
+    
+    # calculate the percentage drop as current_drop
+    if all_time_high > 0:
+        current_drop = ((current_price - all_time_high) / all_time_high) * 100
+    else:
+        current_drop = 0.0
+        
+    # helper to parse percentage string to float
+    def parse_change(change_str):
+        return float(change_str.replace('%', ''))
+        
+    # find out the worst change2 in data loaded from json
+    worst_drop_entry = min(filtered_data, key=lambda x: parse_change(x["change2"]))
+    worst_drop = parse_change(worst_drop_entry["change2"])
+    worst_drop_date = worst_drop_entry["date"]
+    
+    # calculate close_index
+    if worst_drop == 0:
+        close_index = 0.0
+    else:
+        close_index = (worst_drop - current_drop) / worst_drop
+        
+    # check data and calculate how many days have change2 lower than current_drop
+    drop_days = sum(1 for x in filtered_data if parse_change(x["change2"]) < current_drop)
+    
+    # calculate buy_chance
+    total_days = len(filtered_data)
+    buy_chance = drop_days / total_days if total_days > 0 else 0.0
+    
+    return close_index, buy_chance, current_drop, worst_drop, current_price, worst_drop_date, change_today
+
+
 # Example usage and testing
 if __name__ == "__main__":
     print("=" * 80)
@@ -270,17 +595,18 @@ if __name__ == "__main__":
     
     # Example 1: Historical period
     print("\nExample 1: Historical period")
-    drop1 = stock_drop_percentage('AAPL', '2020-01-01', '2020-12-31')
+    drop1 = stock_drop_percentage('AAPL', '2000-01-01', 'CURRENT')
+   
     
     # Example 2: Current time
     print("\n" + "=" * 80)
     print("\nExample 2: Current time")
-    drop2 = stock_drop_percentage('NVDA', '2023-01-01', 'CURRENT')
+    drop2 = stock_drop_percentage('NVDA', '2000-01-01', 'CURRENT')
     
     # Example 3: Recent period
     print("\n" + "=" * 80)
     print("\nExample 3: Recent period")
-    drop3 = stock_drop_percentage('MSFT', '2024-01-01', 'CURRENT')
+    drop3 = stock_drop_percentage('MSFT', '2000-01-01', 'CURRENT')
     
     print("\n" + "=" * 80)
     print("Analysis Complete")

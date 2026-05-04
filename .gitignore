@@ -14,7 +14,9 @@ ENV/
 # Project specific
 tmp/
 repository/csv/
+repository/json/
 repository/13f/CIK_*/202*.*
+web_server.log
 
 # IDE settings
 .gemini/

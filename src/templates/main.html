@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Insight Pro - Home</title>
+    <!-- Modern typography from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .class-card {
+            background: #1e1e24; /* matching typical dark mode cards */
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .class-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-color: #4a90e2;
+        }
+        .class-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .class-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .class-tickers {
+            font-size: 0.9rem;
+            color: #aaa;
+            line-height: 1.5;
+        }
+        .main-header {
+            text-align: center;
+            padding: 4rem 2rem 2rem;
+        }
+        .main-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .main-header p {
+            font-size: 1.2rem;
+            color: #aaa;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="main-header">
+            <div class="logo" style="justify-content: center; margin-bottom: 1rem;">
+                <span class="icon" style="font-size: 3rem;">📈</span>
+            </div>
+            <h1>Stock Insight <span class="highlight">Pro</span></h1>
+            <p>Select an investment class dashboard to view performance metrics</p>
+        </header>
+
+        <main class="classes-grid">
+            {% for category in tkr_data %}
+            <a href="/class/{{ category.class }}" class="class-card">
+                {% if category.class == 'Tech' %}
+                    <div class="class-icon">💻</div>
+                {% elif category.class == 'Financial' %}
+                    <div class="class-icon">🏦</div>
+                {% elif category.class == 'Semiconductors' %}
+                    <div class="class-icon">🚀</div>
+                {% elif category.class == 'My Portfolio' %}
+                    <div class="class-icon">⭐</div>
+                {% else %}
+                    <div class="class-icon">📊</div>
+                {% endif %}
+                <div class="class-title">{{ category.class }} Portfolio</div>
+                <div class="class-tickers">
+                    <strong>ETFs:</strong> {{ category.etf_tickers | join(', ') }}<br>
+                    <strong>Stocks:</strong> {{ category.tickers | join(', ') }}
+                </div>
+            </a>
+            {% endfor %}
+        </main>
+    </div>
+</body>
+</html>

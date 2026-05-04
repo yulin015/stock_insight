@@ -1,0 +1,61 @@
+[
+  {
+    "class": "Tech",
+    "etf_tickers": [
+      "SPY",
+      "QQQ",
+      "XLK"
+    ],
+    "tickers": [
+      "MSFT",
+      "AAPL",
+      "GOOG",
+      "META",
+      "AMZN",
+      "NVDA",
+      "AMD",
+      "TSLA"
+    ]
+  },
+  {
+    "class": "Financial",
+    "etf_tickers": [
+      "SPY",
+      "QQQ",
+      "XLF"
+    ],
+    "tickers": [
+      "BRK-B",
+      "AXP",
+      "MA",
+      "V"
+    ]
+  },
+  {
+    "class": "Semiconductors",
+    "etf_tickers": [
+      "SPY",
+      "QQQ",
+      "SOXX"
+    ],
+    "tickers": [
+      "NVDA",
+      "AMD",
+      "ARM",
+      "INTC",
+      "TQQQ",
+      "SOXL"
+    ]
+  },
+  {
+    "class": "My Portfolio",
+    "etf_tickers": [
+      "SPY",
+      "QQQ"
+    ],
+    "tickers": [
+      "AAPL",
+      "MSFT"
+    ]
+  }
+]

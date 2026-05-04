@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ class_name }} | Stock Insight Dashboard</title>
+    <!-- Modern typography from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <div class="app-container">
+        <header class="dashboard-header">
+            <div class="logo">
+                <span class="icon">📈</span>
+                <div style="display: flex; flex-direction: column;">
+                    <h1>{{ class_name }} <span class="highlight">Insight</span></h1>
+                    <a href="/" class="back-link"
+                        style="font-size: 0.8rem; color: var(--text-secondary); text-decoration: none; margin-top: 0.25rem;">&larr;
+                        Back to Portfolios</a>
+                </div>
+            </div>
+            <div class="status-indicator">
+                <div class="pulse-dot"></div>
+                <span id="last-updated">Waiting for data...</span>
+            </div>
+        </header>
+
+        <main class="dashboard-grid" id="ticker-grid">
+            <!-- Ticker cards will be injected here by app.js -->
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Initializing engines & verifying market data...</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Template for a Ticker Card (Used by JS) -->
+    <template id="ticker-card-template">
+        <article class="ticker-card">
+            <div class="card-header">
+                <div class="ticker-info" style="display: flex; align-items: baseline; gap: 0.75rem;">
+                    <h2><a class="ticker-symbol" href="#" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;"></a></h2>
+                    <span class="current-price-val"
+                        style="font-size: 1.1rem; color: var(--text-secondary); font-weight: 600;">$--</span>
+                </div>
+                <div class="term-tabs">
+                    <button class="term-tab active" data-term="short">1Y</button>
+                    <button class="term-tab" data-term="mid">3Y</button>
+                    <button class="term-tab" data-term="long">5Y</button>
+                    <button class="term-tab" data-term="longExt">10Y</button>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="metric-group main-metric">
+                    <span class="metric-label">Close Index</span>
+                    <span class="metric-value close-index-val">--</span>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-box">
+                        <span class="metric-label">Buy Chance</span>
+                        <div class="metric-value-container">
+                            <span class="metric-value chance-val">--%</span>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar chance-bar"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metric-box">
+                        <span class="metric-label">Change Today</span>
+                        <span class="metric-value change-today-val">--%</span>
+                    </div>
+
+                    <div class="metric-box">
+                        <span class="metric-label">Current Drop From ATH</span>
+                        <span class="metric-value current-drop-val">--%</span>
+                    </div>
+
+                    <div class="metric-box">
+                        <span class="metric-label">Worst Drop From ATH</span>
+                        <div style="display: flex; flex-direction: column; gap: 0.1rem;">
+                            <span class="metric-value worst-drop-val">--%</span>
+                            <span class="worst-drop-date-val"
+                                style="font-size: 0.7rem; color: var(--text-secondary); opacity: 0.7;">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </template>
+
+    <script>
+        window.APP_CONFIG = {
+            className: "{{ class_name }}"
+        };
+    </script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>
