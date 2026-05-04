@@ -57,5 +57,19 @@
       "AAPL",
       "MSFT"
     ]
+  },
+  {
+    "class": "U.S Sectors",
+    "etf_tickers": [
+      "XLK", "XLV", "XLF", "XLY", "XLP", "XLC", "XLI", "XLE", "XLU", "XLRE", "XLB"
+    ],
+    "tickers": []
+  },
+  {
+    "class": "Canada Sectors",
+    "etf_tickers": [
+      "XFN.TO", "XEG.TO", "XMA.TO", "XIN.TO", "XIT.TO", "XUT.TO", "XST.TO", "XHC.TO", "XRE.TO"
+    ],
+    "tickers": []
   }
 ]

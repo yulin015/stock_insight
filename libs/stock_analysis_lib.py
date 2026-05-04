@@ -5,6 +5,11 @@ import os
 import json
 
 
+# Setup absolute path to repository directory
+LIBS_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(LIBS_DIR)
+REPOSITORY_DIR = os.path.join(PROJECT_ROOT, "repository")
+
 
 def download_stock_history(stock_ticker: str, start_date: pd.Timestamp, end_date: pd.Timestamp, end_date_str: str, csv_file: str, is_current: bool) -> bool:
     """
@@ -162,9 +167,9 @@ def stock_drop_percentage(stock_ticker: str, start_time: str, end_time: str) -> 
     
     try:
         # Setup local database path
-        repository_dir = os.path.join("repository", "csv")
-        os.makedirs(repository_dir, exist_ok=True)
-        csv_file = os.path.join(repository_dir, f"{stock_ticker}.csv")
+        csv_dir = os.path.join(REPOSITORY_DIR, "csv")
+        os.makedirs(csv_dir, exist_ok=True)
+        csv_file = os.path.join(csv_dir, f"{stock_ticker}.csv")
         
         # Determine the end date
         if is_current:
@@ -320,7 +325,7 @@ def stock_csv_to_json(stock_ticker: str) -> list:
     Returns:
         list: A list of dictionaries containing the formatted daily data.
     """
-    csv_file = os.path.join("repository", "csv", f"{stock_ticker}.csv")
+    csv_file = os.path.join(REPOSITORY_DIR, "csv", f"{stock_ticker}.csv")
     if not os.path.exists(csv_file):
         print(f"Error: CSV file not found for {stock_ticker}")
         return []
@@ -375,7 +380,7 @@ def stock_csv_to_json(stock_ticker: str) -> list:
             }
             result.append(entity)
             
-        json_dir = os.path.join("repository", "json")
+        json_dir = os.path.join(REPOSITORY_DIR, "json")
         os.makedirs(json_dir, exist_ok=True)
         json_file = os.path.join(json_dir, f"{stock_ticker}.json")
         with open(json_file, 'w') as f:
@@ -399,7 +404,7 @@ def stock_price_check(ticker: str, term: str) -> tuple[float, float, float, floa
     Returns:
         tuple[float, float, float, float, float, str, float]: A tuple containing (close_index, buy_chance, current_drop, worst_drop, current_price, worst_drop_date, change_today).
     """
-    json_file = os.path.join("repository", "json", f"{ticker}.json")
+    json_file = os.path.join(REPOSITORY_DIR, "json", f"{ticker}.json")
     if not os.path.exists(json_file):
         print(f"Error: JSON file not found for {ticker}. Please generate it first.")
         return 0.0, 0.0, 0.0, 0.0, 0.0, "", 0.0
@@ -495,7 +500,7 @@ def stock_price_check_by_date(ticker: str, target_date_str: str, term: str) -> t
     Returns:
         tuple[float, float, float, float, float, str, float]: A tuple containing (close_index, buy_chance, current_drop, worst_drop, current_price, worst_drop_date, change_today).
     """
-    json_file = os.path.join("repository", "json", f"{ticker}.json")
+    json_file = os.path.join(REPOSITORY_DIR, "json", f"{ticker}.json")
     if not os.path.exists(json_file):
         print(f"Error: JSON file not found for {ticker}. Please generate it first.")
         return 0.0, 0.0, 0.0, 0.0, 0.0, "", 0.0
