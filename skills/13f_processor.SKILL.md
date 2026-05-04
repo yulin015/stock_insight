@@ -14,7 +14,7 @@ This skill defines the process for converting SEC 13F Primary and Holding XML fi
 ### 2. Execution
 Run the following command to process and aggregate the data:
 ```bash
-python3 skills/scripts/13f_processor.py \
+python skills/scripts/13f_processor.py \
   --primary [path_to_primary] \
   --holding [path_to_holding] \
   --output repository/13f/CIK_[CIK]/[period].json

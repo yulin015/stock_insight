@@ -1,65 +1,73 @@
-# stock_insight
+# Stock Insight Pro
 
-# Stock Insight SEC Fetcher & Analyzer
+A professional stock analysis dashboard for monitoring portfolio performance and market sectors.
 
-This project provides tools to fetch SEC 13F filings, process the XML data into aggregated JSON, and analyze stock performance. It is designed to work with the **Antigravity IDE** using the Model Context Protocol (MCP).
+## Prerequisites
 
-## Features
-- **MCP SEC Fetcher**: A custom MCP server to download 13F XMLs with the required SEC User-Agent.
-- **13F Processor Skill**: An AI-powered skill to aggregate holdings by CUSIP and convert XML to JSON.
-- **Stock Analysis Library**: Python utilities for analyzing price drops from All-Time Highs.
+- **Python 3.10+**
+- **Node.js 18+** (for the MCP server)
 
 ## Installation
 
-### 1. Prerequisites
-- **Node.js** (v20+)
-- **Python** (v3.9+)
-- **curl** (Available in your system PATH)
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yulin015/stock_insight.git
+   cd stock_insight
+   ```
 
-### 2. Python Dependencies
-Install the required Python libraries:
-```bash
-pip install -r requirements.txt
-```
+2. **Install Python dependencies:**
+   - **Windows:**
+     ```bash
+     python -m pip install -r requirements.txt
+     ```
+   - **macOS/Linux:**
+     ```bash
+     pip install -r requirements.txt
+     ```
 
-### 3. MCP Server Setup (Node.js)
-The project includes a local MCP server for fetching data.
-```bash
-cd mcp
-npm install
-```
+3. **Install Node.js dependencies (Optional - for MCP server):**
+   ```bash
+   cd mcp
+   npm install
+   cd ..
+   ```
 
-### 4. Configure Antigravity IDE
-To enable the `sec-fetcher` tool, ensure your project has the local MCP configuration:
+## Running the Application
 
-1. Create/verify `.vscode/mcp.json` in the project root:
-```json
-{
-  "mcpServers": {
-    "sec-fetcher": {
-      "command": "node",
-      "args": ["${workspaceFolder}/mcp/sec-fetcher.js"]
-    }
-  }
-}
-```
-2. Open the **MCP Servers** panel in Antigravity and click **Refresh**.
+### 1. Start the Web Dashboard
+Navigate to the `src` directory and run the web server:
 
-### 5. AI Skills Setup
-The `skills/` directory contains AI instruction sets. Make sure this folder is indexed by your agent to enable automatic 13F processing.
+- **Windows:**
+  ```bash
+  python src/web_server.py
+  ```
+- **macOS/Linux:**
+  ```bash
+  python3 src/web_server.py
+  ```
+
+The dashboard will be available at [http://127.0.0.1:5001](http://127.0.0.1:5001).
+
+### 2. Start the Monitoring Loop (Optional)
+To run the background monitoring service:
+
+- **Windows:**
+  ```bash
+  python src/main.py
+  ```
+- **macOS/Linux:**
+  ```bash
+  python3 src/main.py
+  ```
 
 ## Project Structure
-- `mcp/`: Contains the MCP server implementation.
-- `skills/`: AI Skills and processing scripts.
-- `libs/`: Core Python analysis libraries.
-- `repository/`: Data storage for fetched 13F filings and CSVs.
-- `tmp/`: Temporary storage for raw downloads.
 
-## Usage
-Once configured, you can tell the AI:
-- *"Fetch the 13F from [URL] and save as [filename]."*
-- *"Summarize the 13F files in repository/13f/CIK_1067983/."*
+- `src/`: Main application code (Web server, monitoring loop, templates).
+- `libs/`: Core stock analysis logic and data processing.
+- `repository/`: Local data cache (CSV and JSON files).
+- `mcp/`: Model Context Protocol server for SEC 13F data fetching.
+- `skills/`: AI agent skill definitions and processing scripts.
 
-## License
-MIT
+## Cross-Platform Support
 
+This project is designed to run on Windows, macOS, and Linux. It uses `os.path` for robust file path handling across different operating systems.
