@@ -21,3 +21,4 @@ web_server.log
 # IDE settings
 .gemini/
 .DS_Store
+scratch/
