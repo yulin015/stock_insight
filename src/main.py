@@ -56,8 +56,8 @@ def verify_and_rebuild_data(tickers):
 
 
 def main():
-    # 1. Load list of tickers from src/tkr.json
-    tkr_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tkr.json")
+    # 1. Load list of tickers from config/tkr.json
+    tkr_file = os.path.join(project_root, "config", "tkr.json")
     if not os.path.exists(tkr_file):
         print(f"Error: ticker list file {tkr_file} not found.")
         return

@@ -18,7 +18,7 @@ from src.main import verify_and_rebuild_data
 app = Flask(__name__)
 
 # Load tickers once at startup
-tkr_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tkr.json")
+tkr_file = os.path.join(project_root, "config", "tkr.json")
 tkr_data = []
 tickers = []
 
