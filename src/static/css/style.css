@@ -29,7 +29,7 @@ body {
 }
 
 .app-container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 2rem;
 }
@@ -90,7 +90,7 @@ body {
 /* Grid Layout */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 2rem;
 }
 
@@ -287,6 +287,25 @@ body {
 .color-red { color: var(--accent-red) !important; }
 .color-blue { color: var(--accent-blue) !important; }
 .color-white { color: var(--text-primary) !important; }
+
+/* Close Index Gradient Overrides */
+.close-index-green {
+    background: linear-gradient(to right, #10b981, #34d399) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+.close-index-blue {
+    background: linear-gradient(to right, #3b82f6, #60a5fa) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+.close-index-red {
+    background: linear-gradient(to right, #ef4444, #f87171) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
 
 /* Annual Change Link */
 .annual-change-link {

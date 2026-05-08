@@ -137,6 +137,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const closeIndexEl = card.querySelector('.close-index-val');
         closeIndexEl.textContent = data.close_index.toFixed(4);
         
+        // Color code Close Index
+        if (data.close_index >= 0.5) {
+            closeIndexEl.className = 'metric-value close-index-val close-index-green';
+        } else if (data.close_index >= 0.2) {
+            closeIndexEl.className = 'metric-value close-index-val close-index-blue';
+        } else {
+            closeIndexEl.className = 'metric-value close-index-val close-index-red';
+        }
+        
         // Buy Chance
         const chanceEl = card.querySelector('.chance-val');
         const chanceBar = card.querySelector('.chance-bar');
