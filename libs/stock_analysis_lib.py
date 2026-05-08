@@ -642,6 +642,68 @@ def stock_annual_change(ticker: str) -> list:
         return []
 
 
+def stock_cashflow_change(ticker_symbol: str) -> tuple[list, list]:
+    """
+    Extract annual and quarterly cash flow data for a given stock ticker.
+    
+    Args:
+        ticker_symbol (str): The stock ticker symbol.
+        
+    Returns:
+        tuple[list, list]: A tuple containing (annual_change, quarter_change).
+            Each list contains entries as ["Date", "Operating Cash Flow", "Capital Expenditure", "Free Cash Flow"].
+    """
+    try:
+        ticker = yf.Ticker(ticker_symbol)
+        
+        def extract_metrics(df, is_annual=True):
+            if df is None or df.empty:
+                return []
+            
+            # Required rows in yfinance cashflow statement
+            if "Operating Cash Flow" not in df.index or "Capital Expenditure" not in df.index:
+                return []
+            
+            result = []
+            # Sort columns in ascending order (chronological)
+            sorted_columns = sorted(df.columns)
+            
+            for col in sorted_columns:
+                date_val = col
+                if is_annual:
+                    date_str = str(date_val.year)
+                else:
+                    date_str = date_val.strftime('%Y-%m-%d')
+                
+                try:
+                    ocf = float(df.loc["Operating Cash Flow", col])
+                    capex = float(df.loc["Capital Expenditure", col])
+                    # CapEx is usually negative in yfinance. FCF = OCF + CapEx
+                    fcf = ocf + capex
+                    
+                    # Handle NaN values
+                    if pd.isna(ocf): ocf = 0.0
+                    if pd.isna(capex): capex = 0.0
+                    if pd.isna(fcf): fcf = 0.0
+                    
+                    result.append([date_str, ocf, capex, fcf])
+                except (KeyError, ValueError, TypeError):
+                    continue
+            
+            return result
+
+        annual_change = extract_metrics(ticker.cashflow, is_annual=True)
+        quarter_change = extract_metrics(ticker.quarterly_cashflow, is_annual=False)
+        
+        return annual_change, quarter_change
+
+    except Exception as e:
+        print(f"Error extracting cash flow for {ticker_symbol}: {e}")
+        return [], []
+
+
+
+
 # Example usage and testing
 if __name__ == "__main__":
     print("=" * 80)

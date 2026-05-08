@@ -86,27 +86,53 @@ document.addEventListener('DOMContentLoaded', () => {
         grid.appendChild(card);
     }
 
-    function openAnnualChangeModal(ticker) {
-        modalTitle.textContent = `${ticker} Annual Performance`;
-        modalImg.style.display = 'none';
-        modalLoader.style.display = 'block';
+    async function openAnnualChangeModal(ticker) {
+        modalTitle.textContent = `${ticker} Performance History`;
         modal.style.display = 'flex';
         
-        // Use a cache-busting timestamp to ensure we get a fresh image if data changed
-        const timestamp = new Date().getTime();
-        const imgSrc = `/api/annual_change_chart/${encodeURIComponent(ticker)}?t=${timestamp}`;
+        const chartImg = document.getElementById('annual-change-chart');
+        const annualCfImg = document.getElementById('annual-cashflow-chart');
+        const quarterlyCfImg = document.getElementById('quarterly-cashflow-chart');
+        const loader = document.getElementById('modal-loader');
         
-        const tempImg = new Image();
-        tempImg.onload = () => {
-            modalImg.src = imgSrc;
-            modalImg.style.display = 'block';
-            modalLoader.style.display = 'none';
+        // Hide charts, show loader
+        chartImg.style.display = 'none';
+        annualCfImg.style.display = 'none';
+        quarterlyCfImg.style.display = 'none';
+        loader.style.display = 'block';
+        
+        // Add timestamp to prevent caching
+        const ts = new Date().getTime();
+        chartImg.src = `/api/annual_change_chart/${ticker}?t=${ts}`;
+        annualCfImg.src = `/api/annual_cashflow_chart/${ticker}?t=${ts}`;
+        quarterlyCfImg.src = `/api/quarterly_cashflow_chart/${ticker}?t=${ts}`;
+        
+        // Handle image loading
+        let loadedCount = 0;
+        const totalImages = 3;
+        
+        const onImageLoad = () => {
+            loadedCount++;
+            if (loadedCount === totalImages) {
+                loader.style.display = 'none';
+                chartImg.style.display = 'block';
+                annualCfImg.style.display = 'block';
+                quarterlyCfImg.style.display = 'block';
+            }
         };
-        tempImg.onerror = () => {
-            modalLoader.style.display = 'none';
-            alert(`Failed to load annual change chart for ${ticker}`);
+
+        chartImg.onload = onImageLoad;
+        annualCfImg.onload = onImageLoad;
+        quarterlyCfImg.onload = onImageLoad;
+        
+        // Error handling
+        const onImageError = (e) => {
+            console.error("Error loading chart:", e.target.id);
+            onImageLoad(); // Still count it so loader disappears
         };
-        tempImg.src = imgSrc;
+        chartImg.onerror = onImageError;
+        annualCfImg.onerror = onImageError;
+        quarterlyCfImg.onerror = onImageError;
     }
 
     // Close modal logic
