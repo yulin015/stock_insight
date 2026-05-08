@@ -591,6 +591,56 @@ def stock_price_check_by_date(ticker: str, target_date_str: str, term: str) -> t
     
     return close_index, buy_chance, current_drop, worst_drop, current_price, worst_drop_date, change_today
 
+def stock_annual_change(ticker: str) -> list:
+    """
+    Calculate the annual percentage change for a given stock ticker based on historical CSV data.
+    
+    Args:
+        ticker (str): The stock ticker symbol.
+        
+    Returns:
+        list: A list of dictionaries, each containing year and its percentage change.
+              Example: [{"2020": "15.50 %"}, {"2021": "-10.20 %"}]
+    """
+    csv_file = os.path.join(REPOSITORY_DIR, "csv", f"{ticker}.csv")
+    if not os.path.exists(csv_file):
+        print(f"Error: CSV file not found for {ticker}")
+        return []
+        
+    try:
+        # Read the CSV file, skipping the first 3 rows
+        df = pd.read_csv(csv_file, skiprows=3, names=['Date', 'Close', 'High', 'Low', 'Open', 'Volume'])
+        
+        # Parse dates and sort
+        df['Date'] = pd.to_datetime(df['Date'], utc=True)
+        df['Year'] = df['Date'].dt.year
+        
+        annual_changes = []
+        
+        # Group by Year
+        years = sorted(df['Year'].unique())
+        
+        for year in years:
+            year_data = df[df['Year'] == year].sort_values('Date')
+            if year_data.empty:
+                continue
+                
+            first_price = float(year_data['Close'].iloc[0])
+            last_price = float(year_data['Close'].iloc[-1])
+            
+            if first_price != 0:
+                change_percentage = ((last_price - first_price) / first_price) * 100
+            else:
+                change_percentage = 0.0
+                
+            annual_changes.append({str(year): f"{change_percentage:.2f} %"})
+            
+        return annual_changes
+        
+    except Exception as e:
+        print(f"Error calculating annual change for {ticker}: {e}")
+        return []
+
 
 # Example usage and testing
 if __name__ == "__main__":

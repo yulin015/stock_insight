@@ -2,13 +2,17 @@ import sys
 import os
 from datetime import datetime
 import json
-from flask import Flask, render_template, jsonify, request
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+from io import BytesIO
+from flask import Flask, render_template, jsonify, request, send_file
 
 # Add the root project directory to sys.path so we can import libs and src modules
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 
-from libs.stock_analysis_lib import stock_price_check
+from libs.stock_analysis_lib import stock_price_check, stock_annual_change
 from src.main import verify_and_rebuild_data
 
 app = Flask(__name__)
@@ -97,6 +101,65 @@ def api_metrics():
         "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         "metrics": data
     })
+
+@app.route('/api/annual_change_chart/<ticker>')
+def annual_change_chart(ticker):
+    """Generate and serve an annual change bar chart for a ticker."""
+    data = stock_annual_change(ticker)
+    if not data:
+        return "No data found for this ticker.", 404
+        
+    years = []
+    changes = []
+    colors = []
+    
+    for entry in data:
+        for year, val_str in entry.items():
+            years.append(year)
+            # Remove % and convert to float
+            try:
+                val = float(val_str.replace('%', '').strip())
+                changes.append(val)
+                colors.append('#10b981' if val >= 0 else '#ef4444') # Use theme colors
+            except ValueError:
+                continue
+                
+    if not years:
+        return "No valid annual data available.", 404
+
+    # Create the plot
+    plt.figure(figsize=(12, 6), facecolor='none')
+    plt.style.use('dark_background')
+    
+    bars = plt.bar(years, changes, color=colors, edgecolor=(1, 1, 1, 0.1), linewidth=1)
+    plt.title(f'{ticker} Annual Performance', fontsize=16, fontweight='bold', pad=20)
+    plt.ylabel('Change (%)', fontsize=12, labelpad=10)
+    plt.xlabel('Year', fontsize=12, labelpad=10)
+    plt.xticks(rotation=45)
+    
+    # Customize grid and spines
+    plt.grid(axis='y', linestyle='--', alpha=0.2)
+    plt.gca().spines['top'].set_visible(False)
+    plt.gca().spines['right'].set_visible(False)
+    plt.gca().spines['left'].set_alpha(0.3)
+    plt.gca().spines['bottom'].set_alpha(0.3)
+    
+    # Add labels on top of bars
+    for bar in bars:
+        height = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2., height + (1 if height > 0 else -3),
+                 f'{height:.1f}%', ha='center', va='bottom' if height > 0 else 'top', 
+                 fontsize=9, color='white', alpha=0.8)
+
+    plt.tight_layout()
+    
+    # Save to buffer
+    img = BytesIO()
+    plt.savefig(img, format='png', transparent=True, dpi=120)
+    img.seek(0)
+    plt.close()
+    
+    return send_file(img, mimetype='image/png')
 
 if __name__ == '__main__':
     # Initialize immediately if running directly

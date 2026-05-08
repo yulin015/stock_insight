@@ -3,6 +3,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const template = document.getElementById('ticker-card-template');
     const lastUpdatedEl = document.getElementById('last-updated');
     
+    // Modal elements
+    const modal = document.getElementById('chart-modal');
+    const modalImg = document.getElementById('annual-change-chart');
+    const modalTitle = document.getElementById('modal-ticker-title');
+    const modalLoader = document.getElementById('modal-loader');
+    const closeModal = document.querySelector('.close-modal');
+    
     // Store data locally so we can swap tabs without re-fetching
     let currentMetrics = {};
     
@@ -68,9 +75,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateCardData(card);
             });
         });
+
+        // Add event listener for Annual Change link
+        const annualChangeLink = card.querySelector('.annual-change-link');
+        annualChangeLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            openAnnualChangeModal(ticker);
+        });
         
         grid.appendChild(card);
     }
+
+    function openAnnualChangeModal(ticker) {
+        modalTitle.textContent = `${ticker} Annual Performance`;
+        modalImg.style.display = 'none';
+        modalLoader.style.display = 'block';
+        modal.style.display = 'flex';
+        
+        // Use a cache-busting timestamp to ensure we get a fresh image if data changed
+        const timestamp = new Date().getTime();
+        const imgSrc = `/api/annual_change_chart/${encodeURIComponent(ticker)}?t=${timestamp}`;
+        
+        const tempImg = new Image();
+        tempImg.onload = () => {
+            modalImg.src = imgSrc;
+            modalImg.style.display = 'block';
+            modalLoader.style.display = 'none';
+        };
+        tempImg.onerror = () => {
+            modalLoader.style.display = 'none';
+            alert(`Failed to load annual change chart for ${ticker}`);
+        };
+        tempImg.src = imgSrc;
+    }
+
+    // Close modal logic
+    closeModal.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
     
     function updateAllCards() {
         const cards = grid.querySelectorAll('.ticker-card');
