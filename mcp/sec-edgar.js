@@ -4,7 +4,6 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import https from "https";
 
 /**
  * Custom MCP Server for SEC EDGAR interaction.
@@ -22,28 +21,39 @@ const server = new Server(
 );
 
 const USER_AGENT = process.env.EDGAR_IDENTITY || "Yulin Chen chenyulin.ca@gmail.com";
+const SEC_DATA_BASE = "https://data.sec.gov";
 
 /**
- * Helper to fetch JSON from URL
+ * Fetch JSON via global fetch (follows redirects, checks status + content-type).
  */
-function fetchJson(url) {
-  return new Promise((resolve, reject) => {
-    https.get(url, {
-      headers: { "User-Agent": USER_AGENT }
-    }, (res) => {
-      let data = "";
-      res.on("data", (chunk) => { data += chunk; });
-      res.on("end", () => {
-        try {
-          resolve(JSON.parse(data));
-        } catch (e) {
-          reject(new Error(`Failed to parse response from ${url}: ${e.message}`));
-        }
-      });
-    }).on("error", (err) => {
-      reject(err);
-    });
+async function fetchJson(url) {
+  const res = await fetch(url, {
+    headers: { "User-Agent": USER_AGENT, "Accept": "application/json" },
+    redirect: "follow",
   });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`HTTP ${res.status} from ${url}: ${body.slice(0, 200)}`);
+  }
+  const ctype = res.headers.get("content-type") || "";
+  if (!ctype.toLowerCase().includes("json")) {
+    const body = await res.text();
+    throw new Error(`Expected JSON from ${url} but got "${ctype}": ${body.slice(0, 200)}`);
+  }
+  return res.json();
+}
+
+/**
+ * Yield each submissions page (newest-first) for a CIK. The primary
+ * submissions JSON exposes `filings.recent`; older filings live in
+ * separate paginated files listed under `filings.files`.
+ */
+async function* iterFilingPages(paddedCik) {
+  const primary = await fetchJson(`${SEC_DATA_BASE}/submissions/CIK${paddedCik}.json`);
+  yield primary.filings.recent;
+  for (const page of primary.filings.files || []) {
+    yield await fetchJson(`${SEC_DATA_BASE}/submissions/${page.name}`);
+  }
 }
 
 /**
@@ -124,24 +134,21 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     const paddedCik = cik.toString().padStart(10, '0');
     try {
-      const filingsData = await fetchJson(`https://data.sec.gov/submissions/CIK${paddedCik}.json`);
-      const recent = filingsData.filings.recent;
       const results = [];
-
-      for (let i = 0; i < recent.accessionNumber.length; i++) {
-        if (formFilter && recent.form[i].toUpperCase() !== formFilter) {
-          continue;
+      pages: for await (const page of iterFilingPages(paddedCik)) {
+        for (let i = 0; i < page.accessionNumber.length; i++) {
+          if (formFilter && page.form[i].toUpperCase() !== formFilter) {
+            continue;
+          }
+          results.push({
+            accession: page.accessionNumber[i],
+            form: page.form[i],
+            filingDate: page.filingDate[i],
+            primaryDocument: page.primaryDocument[i],
+            url: `https://www.sec.gov/Archives/edgar/data/${parseInt(cik)}/${page.accessionNumber[i].replace(/-/g, '')}/${page.primaryDocument[i]}`
+          });
+          if (results.length >= limit) break pages;
         }
-
-        results.push({
-          accession: recent.accessionNumber[i],
-          form: recent.form[i],
-          filingDate: recent.filingDate[i],
-          primaryDocument: recent.primaryDocument[i],
-          url: `https://www.sec.gov/Archives/edgar/data/${parseInt(cik)}/${recent.accessionNumber[i].replace(/-/g, '')}/${recent.primaryDocument[i]}`
-        });
-
-        if (results.length >= limit) break;
       }
 
       return {
