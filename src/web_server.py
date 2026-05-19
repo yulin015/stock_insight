@@ -12,7 +12,7 @@ from flask import Flask, render_template, jsonify, request, send_file
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 
-from libs.stock_analysis_lib import stock_price_check, stock_annual_change, stock_cashflow_change
+from libs.stock_analysis_lib import stock_price_check, stock_annual_change, stock_cashflow_change, _is_market_open
 from src.main import verify_and_rebuild_data
 
 app = Flask(__name__)
@@ -77,6 +77,10 @@ def api_metrics():
         
     if not target_tickers:
         return jsonify({"error": f"No tickers found for class: {class_name}", "metrics": []}), 404
+        
+    # Verify and update the local CSV/JSON database if needed before processing
+    # (Safe to call during market hours; it will only download up to -1 day)
+    verify_and_rebuild_data(target_tickers)
         
     data = []
     for ticker in target_tickers:

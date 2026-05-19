@@ -84,6 +84,10 @@ def main():
         now = datetime.now()
         market_open = _is_market_open(now)
         
+        # Keep data up-to-date in the monitoring loop
+        # (Safe to call during market hours; it will only download up to -1 day)
+        verify_and_rebuild_data(tickers)
+        
         if market_open:
             print(f"\n[{now.strftime('%Y-%m-%d %H:%M:%S')}] Market is OPEN. Running 60s checks...")
             for ticker in tickers:

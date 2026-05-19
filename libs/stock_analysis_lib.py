@@ -57,12 +57,23 @@ def download_stock_history(stock_ticker: str, start_date: pd.Timestamp, end_date
                         try:
                             check_data = yf.Ticker(stock_ticker).history(period="5d")
                             if not check_data.empty:
-                                latest_available = check_data.index.max().tz_localize(None).date()
-                                if latest_available <= last_date_in_db.date():
+                                dates = check_data.index.tz_localize(None).date
+                                latest_available = dates.max()
+                                
+                                target_date = latest_available
+                                if _is_market_open(today) and latest_available == today.date():
+                                    if len(dates) > 1:
+                                        target_date = dates[-2]
+                                        print(f"Market is open. Verifying up to previous business day: {target_date}")
+                                
+                                if target_date <= last_date_in_db.date():
                                     needs_update = False
-                                    print(f"Database is up-to-date (no newer trading days available).")
+                                    print(f"Database is up-to-date (has data up to {target_date}).")
                                 else:
-                                    print(f"Database is outdated (last date: {last_date_in_db.strftime('%Y-%m-%d')}, available: {latest_available}). Will update.")
+                                    print(f"Database is outdated (last date: {last_date_in_db.strftime('%Y-%m-%d')}, required: {target_date}). Will update.")
+                                    # Override end_date to only download up to target_date
+                                    end_date = pd.to_datetime(target_date)
+                                    end_date_str = end_date.strftime('%Y-%m-%d')
                             else:
                                 needs_update = False
                         except Exception:
