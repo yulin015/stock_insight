@@ -27,10 +27,16 @@ const USER_AGENT = process.env.EDGAR_IDENTITY || "Yulin Chen chenyulin.ca@gmail.
  * Helper to fetch JSON from URL
  */
 function fetchJson(url) {
+  console.error(`Fetching: ${url}`);
   return new Promise((resolve, reject) => {
     https.get(url, {
       headers: { "User-Agent": USER_AGENT }
     }, (res) => {
+      if (res.statusCode !== 200) {
+        res.resume(); // Consume response data to free up memory
+        reject(new Error(`HTTP ${res.statusCode}: Failed to fetch ${url}`));
+        return;
+      }
       let data = "";
       res.on("data", (chunk) => { data += chunk; });
       res.on("end", () => {
@@ -45,6 +51,7 @@ function fetchJson(url) {
     });
   });
 }
+
 
 /**
  * Define tools.
@@ -124,24 +131,39 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     const paddedCik = cik.toString().padStart(10, '0');
     try {
-      const filingsData = await fetchJson(`https://data.sec.gov/submissions/CIK${paddedCik}.json`);
-      const recent = filingsData.filings.recent;
+      const primaryData = await fetchJson(`https://data.sec.gov/submissions/CIK${paddedCik}.json`);
       const results = [];
-
-      for (let i = 0; i < recent.accessionNumber.length; i++) {
-        if (formFilter && recent.form[i].toUpperCase() !== formFilter) {
-          continue;
+      
+      const processRecent = (recent) => {
+        for (let i = 0; i < recent.accessionNumber.length; i++) {
+          if (formFilter && recent.form[i].toUpperCase() !== formFilter) continue;
+          
+          results.push({
+            accession: recent.accessionNumber[i],
+            form: recent.form[i],
+            filingDate: recent.filingDate[i],
+            reportDate: recent.reportDate[i],
+            primaryDocument: recent.primaryDocument[i],
+            url: `https://www.sec.gov/Archives/edgar/data/${parseInt(cik)}/${recent.accessionNumber[i].replace(/-/g, '')}/${recent.primaryDocument[i]}`
+          });
+          if (results.length >= limit) return true;
         }
+        return false;
+      };
 
-        results.push({
-          accession: recent.accessionNumber[i],
-          form: recent.form[i],
-          filingDate: recent.filingDate[i],
-          primaryDocument: recent.primaryDocument[i],
-          url: `https://www.sec.gov/Archives/edgar/data/${parseInt(cik)}/${recent.accessionNumber[i].replace(/-/g, '')}/${recent.primaryDocument[i]}`
-        });
+      // Process most recent
+      if (processRecent(primaryData.filings.recent)) {
+        return { content: [{ type: "text", text: JSON.stringify(results, null, 2) }] };
+      }
 
-        if (results.length >= limit) break;
+      // Process historical files if available
+      const historicalFiles = primaryData.filings.files || [];
+      for (const file of historicalFiles) {
+        const historicalData = await fetchJson(`https://data.sec.gov/submissions/${file.name}`);
+        // Historical files are flat, not nested under filings.recent
+        if (processRecent(historicalData)) {
+          break;
+        }
       }
 
       return {
@@ -150,6 +172,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     } catch (error) {
       return { content: [{ type: "text", text: `Error fetching filings: ${error.message}` }], isError: true };
     }
+
   }
 
   throw new Error(`Tool not found: ${name}`);

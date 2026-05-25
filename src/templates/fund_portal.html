@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEC Fund Portal {% if selected_fund %}| {{ selected_fund.ticker }}{% endif %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --sidebar-bg: #1e293b;
+            --accent-color: #3b82f6;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --border-color: #334155;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            background-color: #020617;
+            padding: 12px 24px;
+            display: flex;
+            gap: 24px;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        
+        .nav-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #fff;
+        }
+
+        .nav-link.active {
+            color: var(--accent-color);
+        }
+
+        .app-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Ticker Selector Sidebar */
+        .ticker-sidebar {
+            width: 80px;
+            background-color: #020617;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            flex-shrink: 0;
+        }
+
+        .ticker-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            text-decoration: none;
+        }
+
+        .ticker-icon:hover {
+            background: #334155;
+            color: #fff;
+        }
+
+        .ticker-icon.active {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        /* Filing Sidebar */
+        .sidebar {
+            width: 300px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header h1 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-header p {
+            margin: 4px 0 0;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .filing-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .filing-item {
+            padding: 10px 14px;
+            margin-bottom: 6px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .filing-item:hover {
+            background-color: #334155;
+        }
+
+        .filing-item.active {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-color: var(--accent-color);
+        }
+
+        .filing-date {
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: block;
+        }
+
+        .filing-type {
+            font-size: 0.7rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1px 5px;
+            border-radius: 4px;
+            margin-right: 6px;
+            text-transform: uppercase;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+        }
+
+        .viewer-header {
+            background-color: var(--bg-color);
+            padding: 10px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .current-filing-info {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #64748b;
+            background-color: var(--bg-color);
+        }
+
+        /* 13F Table Styles */
+        .table-container {
+            padding: 24px;
+            overflow-y: auto;
+            height: 100%;
+            box-sizing: border-box;
+            background: #fff;
+            color: #334155;
+        }
+        .summary-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 32px;
+        }
+        .summary-item .label {
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .summary-item .val {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 4px;
+        }
+        .f13-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .f13-table th {
+            text-align: left;
+            padding: 10px 12px;
+            border-bottom: 2px solid #e2e8f0;
+            color: #64748b;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 10;
+        }
+        .f13-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #334155;
+        }
+        .f13-table tr:hover td {
+            background: #f8fafc;
+        }
+        .val-col { text-align: right; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div class="top-nav">
+        <a href="/" class="nav-link">Stocks (10-K/Q)</a>
+        <a href="/funds" class="nav-link active">Funds (13F)</a>
+    </div>
+
+    <div class="app-body">
+        <!-- Ticker Selection -->
+        <div class="ticker-sidebar">
+            {% for f in funds %}
+            <a href="/fund/{{ f.cik }}" class="ticker-icon {% if selected_fund and selected_fund.cik == f.cik %}active{% endif %}">
+                {{ f.ticker }}
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Filing List -->
+        <div class="sidebar">
+            {% if selected_fund %}
+            <div class="sidebar-header">
+                <h1>{{ selected_fund.name }}</h1>
+                <p>CIK {{ selected_fund.cik }}</p>
+            </div>
+            <div class="filing-list" id="thirteen-f-list">
+                {% for date in thirteen_f_dates %}
+                <div class="filing-item" onclick="load13F('{{ selected_fund.cik }}', '{{ date }}', this)">
+                    <span class="filing-date">
+                        <span class="filing-type">13F</span>
+                        {{ date }}
+                    </span>
+                </div>
+                {% endfor %}
+                {% if not thirteen_f_dates %}
+                <div style="padding: 12px; color: #94a3b8; font-size: 0.85rem; text-align: center;">No 13F data found</div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="sidebar-header">
+                <h1>Select Fund</h1>
+                <p>Choose a fund on the left</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Document Viewer -->
+        <div class="main-content">
+            <div class="viewer-header">
+                <div class="current-filing-info" id="current-info">
+                    {% if selected_fund %}Select a filing from the list{% else %}Select a fund to start{% endif %}
+                </div>
+            </div>
+            <div id="viewer-container" style="height: 100%; overflow: hidden;">
+                <div class="empty-state">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <p>No document loaded</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function load13F(cik, date, element) {
+            document.querySelectorAll('.filing-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+            
+            document.getElementById('current-info').innerHTML = `Viewing <strong>13F Holdings</strong> for ${date}`;
+            
+            const container = document.getElementById('viewer-container');
+            container.innerHTML = `<div class="empty-state"><p>Loading 13F Data...</p></div>`;
+            
+            fetch(`/api/13f/${cik}/${date}`)
+                .then(res => res.json())
+                .then(data => {
+                    const formatter = new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    });
+                    
+                    let tableHTML = `
+                        <div class="table-container">
+                            <div class="summary-card">
+                                <div class="summary-item">
+                                    <div class="label">Total Value</div>
+                                    <div class="val">${formatter.format(data.form_data.table_value_total)}</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="label">Report Date</div>
+                                    <div class="val">${data.form_data.period_of_report}</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="label">Holdings Count</div>
+                                    <div class="val">${data.holdings.length}</div>
+                                </div>
+                            </div>
+                            <table class="f13-table">
+                                <thead>
+                                    <tr>
+                                        <th>Issuer</th>
+                                        <th>Class</th>
+                                        <th>CUSIP</th>
+                                        <th class="val-col">Value</th>
+                                        <th class="val-col">Shares</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+                    
+                    data.holdings.forEach(h => {
+                        tableHTML += `
+                            <tr>
+                                <td>${h.name_of_issuer}</td>
+                                <td>${h.title_of_class}</td>
+                                <td>${h.cusip}</td>
+                                <td class="val-col">${formatter.format(h.value)}</td>
+                                <td class="val-col">${h.shares_or_principal_amount.ssh_prnamt.toLocaleString()}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    tableHTML += `</tbody></table></div>`;
+                    container.innerHTML = tableHTML;
+                })
+                .catch(err => {
+                    container.innerHTML = `<div class="empty-state"><p>Error loading data: ${err}</p></div>`;
+                });
+        }
+    </script>
+</body>
+</html>

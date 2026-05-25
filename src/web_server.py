@@ -2,11 +2,14 @@ import sys
 import os
 from datetime import datetime
 import json
+import threading
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from io import BytesIO
 from flask import Flask, render_template, jsonify, request, send_file
+
+matplotlib_lock = threading.Lock()
 
 # Add the root project directory to sys.path so we can import libs and src modules
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -119,50 +122,62 @@ def annual_change_chart(ticker):
     
     for entry in data:
         for year, val_str in entry.items():
-            years.append(year)
             # Remove % and convert to float
             try:
                 val = float(val_str.replace('%', '').strip())
                 changes.append(val)
                 colors.append('#10b981' if val >= 0 else '#ef4444') # Use theme colors
+                years.append(year)
             except ValueError:
                 continue
                 
     if not years:
         return "No valid annual data available.", 404
 
-    # Create the plot
-    plt.figure(figsize=(12, 6), facecolor='none')
-    plt.style.use('dark_background')
-    
-    bars = plt.bar(years, changes, color=colors, edgecolor=(1, 1, 1, 0.1), linewidth=1)
-    plt.title(f'{ticker} Annual Performance', fontsize=16, fontweight='bold', pad=20)
-    plt.ylabel('Change (%)', fontsize=12, labelpad=10)
-    plt.xlabel('Year', fontsize=12, labelpad=10)
-    plt.xticks(rotation=45)
-    
-    # Customize grid and spines
-    plt.grid(axis='y', linestyle='--', alpha=0.2)
-    plt.gca().spines['top'].set_visible(False)
-    plt.gca().spines['right'].set_visible(False)
-    plt.gca().spines['left'].set_alpha(0.3)
-    plt.gca().spines['bottom'].set_alpha(0.3)
-    
-    # Add labels on top of bars
-    for bar in bars:
-        height = bar.get_height()
-        plt.text(bar.get_x() + bar.get_width()/2., height + (1 if height > 0 else -3),
-                 f'{height:.1f}%', ha='center', va='bottom' if height > 0 else 'top', 
-                 fontsize=9, color='white', alpha=0.8)
+    with matplotlib_lock:
+        # Create the plot
+        plt.figure(figsize=(12, 6), facecolor='none')
+        plt.style.use('dark_background')
+        
+        bars = plt.bar(years, changes, color=colors, edgecolor=(1, 1, 1, 0.1), linewidth=1)
+        plt.title(f'{ticker} Annual Performance', fontsize=16, fontweight='bold', pad=20)
+        plt.ylabel('Change (%)', fontsize=12, labelpad=10)
+        plt.xlabel('Year', fontsize=12, labelpad=10)
+        plt.xticks(rotation=45)
+        
+        # Customize grid and spines
+        plt.grid(axis='y', linestyle='--', alpha=0.2)
+        plt.gca().spines['top'].set_visible(False)
+        plt.gca().spines['right'].set_visible(False)
+        plt.gca().spines['left'].set_alpha(0.3)
+        plt.gca().spines['bottom'].set_alpha(0.3)
+        
+        # Calculate dynamic y-limits to make space for labels
+        y_min = min(changes)
+        y_max = max(changes)
+        y_span = y_max - y_min
+        padding = max(y_span * 0.15, 2.0)
+        plt.ylim(y_min - padding, y_max + padding)
+        
+        # Calculate a dynamic label offset (e.g. 2% of the y-span)
+        offset = max(y_span * 0.02, 0.5)
+        
+        # Add labels on top of bars
+        for bar in bars:
+            height = bar.get_height()
+            y_pos = height + (offset if height >= 0 else -offset)
+            plt.text(bar.get_x() + bar.get_width()/2., y_pos,
+                     f'{height:.1f}%', ha='center', va='bottom' if height >= 0 else 'top', 
+                     fontsize=9, color='white', alpha=0.8)
 
-    plt.tight_layout()
-    
-    # Save to buffer
-    img = BytesIO()
-    plt.savefig(img, format='png', transparent=True, dpi=120)
-    img.seek(0)
-    plt.close()
-    
+        plt.tight_layout()
+        
+        # Save to buffer
+        img = BytesIO()
+        plt.savefig(img, format='png', transparent=True, dpi=120, bbox_inches='tight')
+        img.seek(0)
+        plt.close()
+        
     return send_file(img, mimetype='image/png')
 
 def create_cashflow_plot(data, title):
@@ -217,7 +232,7 @@ def create_cashflow_plot(data, title):
         
     plt.tight_layout()
     img = BytesIO()
-    plt.savefig(img, format='png', transparent=True, dpi=120)
+    plt.savefig(img, format='png', transparent=True, dpi=120, bbox_inches='tight')
     img.seek(0)
     plt.close()
     return img
@@ -225,15 +240,17 @@ def create_cashflow_plot(data, title):
 @app.route('/api/annual_cashflow_chart/<ticker>')
 def annual_cashflow_chart(ticker):
     """Serve an annual cash flow bar chart."""
-    annual, _ = stock_cashflow_change(ticker)
-    img = create_cashflow_plot(annual, f'{ticker} Annual Cash Flow')
+    with matplotlib_lock:
+        annual, _ = stock_cashflow_change(ticker)
+        img = create_cashflow_plot(annual, f'{ticker} Annual Cash Flow')
     return send_file(img, mimetype='image/png')
 
 @app.route('/api/quarterly_cashflow_chart/<ticker>')
 def quarterly_cashflow_chart(ticker):
     """Serve a quarterly cash flow bar chart."""
-    _, quarterly = stock_cashflow_change(ticker)
-    img = create_cashflow_plot(quarterly, f'{ticker} Quarterly Cash Flow')
+    with matplotlib_lock:
+        _, quarterly = stock_cashflow_change(ticker)
+        img = create_cashflow_plot(quarterly, f'{ticker} Quarterly Cash Flow')
     return send_file(img, mimetype='image/png')
 
 if __name__ == '__main__':

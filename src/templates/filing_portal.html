@@ -24,6 +24,39 @@
             display: flex;
             height: 100vh;
             overflow: hidden;
+            flex-direction: column;
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            background-color: #020617;
+            padding: 12px 24px;
+            display: flex;
+            gap: 24px;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        
+        .nav-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #fff;
+        }
+
+        .nav-link.active {
+            color: var(--accent-color);
+        }
+
+        .app-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
         }
 
         /* Ticker Selector Sidebar */
@@ -181,34 +214,39 @@
     </style>
 </head>
 <body>
-
-    <!-- Ticker Selection -->
-    <div class="ticker-sidebar">
-        {% for c in companies %}
-        <a href="/ticker/{{ c.ticker }}" class="ticker-icon {% if selected_company and selected_company.ticker == c.ticker %}active{% endif %}">
-            {{ c.ticker }}
-        </a>
-        {% endfor %}
+    <div class="top-nav">
+        <a href="/" class="nav-link active">Stocks (10-K/Q)</a>
+        <a href="/funds" class="nav-link">Funds (13F)</a>
     </div>
 
-    <!-- Filing List -->
-    <div class="sidebar">
-        {% if selected_company %}
-        <div class="sidebar-header">
-            <h1>{{ selected_company.name }}</h1>
-            <p>CIK {{ selected_company.cik }}</p>
-        </div>
-        <div class="filing-list">
-            {% for form in selected_company.forms %}
-            <div class="filing-item" onclick="loadFiling('{{ selected_company.cik }}', '{{ form.date }}', '{{ form.document }}', '{{ form.type }}', this)">
-                <span class="filing-date">
-                    <span class="filing-type">{{ form.type }}</span>
-                    {{ form.date }}
-                </span>
-            </div>
+    <div class="app-body">
+        <!-- Ticker Selection -->
+        <div class="ticker-sidebar">
+            {% for c in companies %}
+            <a href="/ticker/{{ c.ticker }}" class="ticker-icon {% if selected_company and selected_company.ticker == c.ticker %}active{% endif %}">
+                {{ c.ticker }}
+            </a>
             {% endfor %}
         </div>
-        {% else %}
+
+        <!-- Filing List -->
+        <div class="sidebar">
+            {% if selected_company %}
+            <div class="sidebar-header">
+                <h1>{{ selected_company.name }}</h1>
+                <p>CIK {{ selected_company.cik }}</p>
+            </div>
+            <div class="filing-list">
+                {% for form in selected_company.forms %}
+                <div class="filing-item" onclick="loadFiling('{{ selected_company.cik }}', '{{ form.date }}', '{{ form.document }}', '{{ form.type }}', this)">
+                    <span class="filing-date">
+                        <span class="filing-type">{{ form.type }}</span>
+                        {{ form.date }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
         <div class="sidebar-header">
             <h1>Select Company</h1>
             <p>Choose a ticker on the left</p>
@@ -232,6 +270,7 @@
                 <p>No document loaded</p>
             </div>
         </div>
+    </div>
     </div>
 
     <script>

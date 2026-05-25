@@ -450,16 +450,26 @@ def stock_price_check(ticker: str, term: str) -> tuple[float, float, float, floa
     # get ticker current price by yfinance lib
     try:
         stock = yf.Ticker(ticker)
-        hist = stock.history(period="1d")
+        # Fetch 2 days of history to get the previous close
+        hist = stock.history(period="2d")
         if hist.empty:
             print(f"Error: Could not fetch current price for {ticker}.")
             return 0.0, 0.0, 0.0, 0.0, 0.0, "", 0.0
         current_price = float(hist["Close"].iloc[-1])
-        open_price = float(hist["Open"].iloc[-1])
-        if open_price != 0:
-            change_today = ((current_price - open_price) / open_price) * 100
+        
+        if len(hist) >= 2:
+            previous_close = float(hist["Close"].iloc[-2])
+            if previous_close != 0:
+                change_today = ((current_price - previous_close) / previous_close) * 100
+            else:
+                change_today = 0.0
         else:
-            change_today = 0.0
+            # Fallback to change from open if only 1 day of data is returned
+            open_price = float(hist["Open"].iloc[-1])
+            if open_price != 0:
+                change_today = ((current_price - open_price) / open_price) * 100
+            else:
+                change_today = 0.0
     except Exception as e:
         print(f"Error fetching current price for {ticker}: {e}")
         return 0.0, 0.0, 0.0, 0.0, 0.0, "", 0.0
@@ -564,10 +574,26 @@ def stock_price_check_by_date(ticker: str, target_date_str: str, term: str) -> t
         
     current_price = target_day_data["close"]
     target_open_price = target_day_data["open"]
-    if target_open_price != 0:
-        change_today = ((current_price - target_open_price) / target_open_price) * 100
+    
+    # Locate the target day's index in the full sorted list to find the previous close
+    target_idx = None
+    for i, x in enumerate(data):
+        if x["date"] == target_day_data["date"]:
+            target_idx = i
+            break
+            
+    if target_idx is not None and target_idx > 0:
+        previous_close = data[target_idx - 1]["close"]
+        if previous_close != 0:
+            change_today = ((current_price - previous_close) / previous_close) * 100
+        else:
+            change_today = 0.0
     else:
-        change_today = 0.0
+        # Fallback to change from open if it's the very first day in the dataset
+        if target_open_price != 0:
+            change_today = ((current_price - target_open_price) / target_open_price) * 100
+        else:
+            change_today = 0.0
         
     # get max close price in data loaded from json as all_time_high
     all_time_high = max([x["close"] for x in filtered_data])
@@ -631,6 +657,8 @@ def stock_annual_change(ticker: str) -> list:
         # Group by Year
         years = sorted(df['Year'].unique())
         
+        previous_year_close = None
+        
         for year in years:
             year_data = df[df['Year'] == year].sort_values('Date')
             if year_data.empty:
@@ -639,12 +667,18 @@ def stock_annual_change(ticker: str) -> list:
             first_price = float(year_data['Close'].iloc[0])
             last_price = float(year_data['Close'].iloc[-1])
             
-            if first_price != 0:
-                change_percentage = ((last_price - first_price) / first_price) * 100
+            # Use previous year's close as the base if available, else fall back to first day's close
+            base_price = previous_year_close if previous_year_close is not None else first_price
+            
+            if base_price != 0:
+                change_percentage = ((last_price - base_price) / base_price) * 100
             else:
                 change_percentage = 0.0
                 
             annual_changes.append({str(year): f"{change_percentage:.2f} %"})
+            
+            # Remember this year's close for next year's calculation
+            previous_year_close = last_price
             
         return annual_changes
         

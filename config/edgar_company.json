@@ -2247,5 +2247,629 @@
                 "url": "https://www.sec.gov/Archives/edgar/data/1594805/000159480516000019/shopify20fbody.htm"
             }
         ]
+    },
+    {
+        "name": "SALESFORCE, INC.",
+        "ticker": "CRM",
+        "cik": "0001108524",
+        "submission": [
+            "https://data.sec.gov/submissions/CIK0001108524.json",
+            "https://data.sec.gov/submissions/CIK0001108524-submissions-001.json",
+            "https://data.sec.gov/submissions/CIK0001108524-submissions-002.json",
+            "https://data.sec.gov/submissions/CIK0001108524-submissions-003.json",
+            "https://data.sec.gov/submissions/CIK0001108524-submissions-004.json",
+            "https://data.sec.gov/submissions/CIK0001108524-submissions-005.json"
+        ],
+        "forms": [
+            {
+                "type": "10-K",
+                "date": "2026-03-02",
+                "accession": "0001108524-26-000060",
+                "document": "crm-20260131.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852426000060/crm-20260131.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2025-12-04",
+                "accession": "0001108524-25-000238",
+                "document": "crm-20251031.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852425000238/crm-20251031.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2025-09-04",
+                "accession": "0001108524-25-000088",
+                "document": "crm-20250731.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852425000088/crm-20250731.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2025-05-29",
+                "accession": "0001108524-25-000030",
+                "document": "crm-20250430.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852425000030/crm-20250430.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2025-03-05",
+                "accession": "0001108524-25-000006",
+                "document": "crm-20250131.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852425000006/crm-20250131.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2024-12-04",
+                "accession": "0001108524-24-000034",
+                "document": "crm-20241031.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852424000034/crm-20241031.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2024-08-29",
+                "accession": "0001108524-24-000022",
+                "document": "crm-20240731.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852424000022/crm-20240731.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2024-05-30",
+                "accession": "0001108524-24-000009",
+                "document": "crm-20240430.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852424000009/crm-20240430.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2024-03-06",
+                "accession": "0001108524-24-000005",
+                "document": "crm-20240131.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852424000005/crm-20240131.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2023-11-30",
+                "accession": "0001108524-23-000048",
+                "document": "crm-20231031.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852423000048/crm-20231031.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2023-08-31",
+                "accession": "0001108524-23-000040",
+                "document": "crm-20230731.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852423000040/crm-20230731.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2023-06-01",
+                "accession": "0001108524-23-000023",
+                "document": "crm-20230430.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852423000023/crm-20230430.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2023-03-08",
+                "accession": "0001108524-23-000011",
+                "document": "crm-20230131.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852423000011/crm-20230131.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2022-12-01",
+                "accession": "0001108524-22-000060",
+                "document": "crm-20221031.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852422000060/crm-20221031.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2022-08-25",
+                "accession": "0001108524-22-000041",
+                "document": "crm-20220731.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852422000041/crm-20220731.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2022-06-01",
+                "accession": "0001108524-22-000022",
+                "document": "crm-20220430.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852422000022/crm-20220430.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2022-03-11",
+                "accession": "0001108524-22-000013",
+                "document": "crm-20220131.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852422000013/crm-20220131.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2021-12-02",
+                "accession": "0001108524-21-000055",
+                "document": "crm-20211031.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852421000055/crm-20211031.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2021-08-27",
+                "accession": "0001108524-21-000047",
+                "document": "crm-20210731.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852421000047/crm-20210731.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2021-06-02",
+                "accession": "0001108524-21-000030",
+                "document": "crm-20210430.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852421000030/crm-20210430.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2021-03-17",
+                "accession": "0001108524-22-000008",
+                "document": "crm-20210131.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852422000008/crm-20210131.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2020-12-04",
+                "accession": "0001108524-20-000047",
+                "document": "crm-20201031.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852420000047/crm-20201031.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2020-08-28",
+                "accession": "0001108524-20-000041",
+                "document": "crm-20200731.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852420000041/crm-20200731.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2020-06-01",
+                "accession": "0001108524-22-000007",
+                "document": "crm-20200430.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852422000007/crm-20200430.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2020-03-05",
+                "accession": "0001108524-20-000014",
+                "document": "crm-20200131.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852420000014/crm-20200131.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2019-12-04",
+                "accession": "0001108524-19-000076",
+                "document": "crm-20191031.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852419000076/crm-20191031.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2019-08-23",
+                "accession": "0001108524-19-000052",
+                "document": "crmq2fy2010-q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852419000052/crmq2fy2010-q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2019-06-05",
+                "accession": "0001108524-19-000025",
+                "document": "crmq1fy2010-q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852419000025/crmq1fy2010-q.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2019-03-08",
+                "accession": "0001108524-19-000009",
+                "document": "crmq4fy1910-k.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852419000009/crmq4fy1910-k.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2018-11-28",
+                "accession": "0001108524-18-000087",
+                "document": "crmq3fy1910-q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852418000087/crmq3fy1910-q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2018-08-31",
+                "accession": "0001108524-18-000057",
+                "document": "crmq2fy1910-q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852418000057/crmq2fy1910-q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2018-05-31",
+                "accession": "0001108524-18-000035",
+                "document": "crmq1fy1910-q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852418000035/crmq1fy1910-q.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2018-03-09",
+                "accession": "0001108524-18-000011",
+                "document": "crmq4fy1810-k.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852418000011/crmq4fy1810-k.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2017-11-22",
+                "accession": "0001108524-17-000040",
+                "document": "crmq3fy1810-q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852417000040/crmq3fy1810-q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2017-08-25",
+                "accession": "0001108524-17-000020",
+                "document": "crmq2fy1810-q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852417000020/crmq2fy1810-q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2017-05-22",
+                "accession": "0001108524-17-000012",
+                "document": "crmq1fy1810-q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852417000012/crmq1fy1810-q.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2017-03-06",
+                "accession": "0001108524-17-000006",
+                "document": "crm-2017131x10k.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852417000006/crm-2017131x10k.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2016-11-21",
+                "accession": "0001108524-16-000128",
+                "document": "crmq3fy1710-q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852416000128/crmq3fy1710-q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2016-09-01",
+                "accession": "0001108524-16-000085",
+                "document": "crmq2fy1710-q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852416000085/crmq2fy1710-q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2016-05-20",
+                "accession": "0001108524-16-000066",
+                "document": "crmq1fy1710-q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852416000066/crmq1fy1710-q.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2016-03-07",
+                "accession": "0001108524-16-000053",
+                "document": "crm-2016131x10k.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852416000053/crm-2016131x10k.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2015-11-20",
+                "accession": "0001108524-15-000034",
+                "document": "crmq3fy1610-q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852415000034/crmq3fy1610-q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2015-08-25",
+                "accession": "0001108524-15-000025",
+                "document": "crmq2fy1610-q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852415000025/crmq2fy1610-q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2015-05-22",
+                "accession": "0001108524-15-000014",
+                "document": "crmq1fy1610-q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852415000014/crmq1fy1610-q.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2015-03-06",
+                "accession": "0001108524-15-000008",
+                "document": "crm-2015131x10k.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852415000008/crm-2015131x10k.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2014-11-26",
+                "accession": "0001108524-14-000023",
+                "document": "crm-20141031x10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852414000023/crm-20141031x10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2014-08-26",
+                "accession": "0001108524-14-000009",
+                "document": "crm-2014731x10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852414000009/crm-2014731x10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2014-05-30",
+                "accession": "0001445305-14-002370",
+                "document": "crm-2014430x10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000144530514002370/crm-2014430x10q.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2014-03-05",
+                "accession": "0001193125-14-084762",
+                "document": "d648028d10k.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312514084762/d648028d10k.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2013-11-25",
+                "accession": "0001193125-13-453124",
+                "document": "d596888d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312513453124/d596888d10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2013-08-30",
+                "accession": "0001193125-13-354101",
+                "document": "d548588d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312513354101/d548588d10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2013-05-24",
+                "accession": "0001193125-13-235664",
+                "document": "d511576d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312513235664/d511576d10q.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2013-03-08",
+                "accession": "0001193125-13-098852",
+                "document": "d466584d10k.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312513098852/d466584d10k.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2012-11-28",
+                "accession": "0001193125-12-483959",
+                "document": "d434718d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312512483959/d434718d10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2012-08-31",
+                "accession": "0001193125-12-377656",
+                "document": "d378216d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312512377656/d378216d10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2012-05-25",
+                "accession": "0001193125-12-249119",
+                "document": "d334385d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312512249119/d334385d10q.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2012-03-09",
+                "accession": "0001193125-12-107281",
+                "document": "d279348d10k.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312512107281/d279348d10k.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2011-11-29",
+                "accession": "0001193125-11-324675",
+                "document": "d238283d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312511324675/d238283d10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2011-09-06",
+                "accession": "0001193125-11-241110",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312511241110/d10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2011-05-26",
+                "accession": "0001193125-11-151778",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312511151778/d10q.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2011-03-23",
+                "accession": "0001193125-11-075314",
+                "document": "d10k.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312511075314/d10k.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2010-11-24",
+                "accession": "0001193125-10-268895",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312510268895/d10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2010-09-09",
+                "accession": "0001193125-10-207193",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312510207193/d10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2010-05-28",
+                "accession": "0000950130-10-001306",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000095013010001306/d10q.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2010-03-11",
+                "accession": "0001193125-10-053838",
+                "document": "d10k.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312510053838/d10k.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2009-11-25",
+                "accession": "0001193125-09-242413",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312509242413/d10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2009-08-25",
+                "accession": "0001193125-09-180950",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312509180950/d10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2009-05-27",
+                "accession": "0001193125-09-119430",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312509119430/d10q.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2009-03-09",
+                "accession": "0001193125-09-048665",
+                "document": "d10k.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312509048665/d10k.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2008-11-25",
+                "accession": "0001193125-08-243442",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312508243442/d10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2008-08-22",
+                "accession": "0001193125-08-183002",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312508183002/d10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2008-05-23",
+                "accession": "0001193125-08-121851",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312508121851/d10q.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2008-02-29",
+                "accession": "0001193125-08-043828",
+                "document": "d10k.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312508043828/d10k.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2007-11-19",
+                "accession": "0001193125-07-250417",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312507250417/d10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2007-08-17",
+                "accession": "0001193125-07-185336",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312507185336/d10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2007-05-18",
+                "accession": "0001193125-07-118825",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312507118825/d10q.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2007-03-09",
+                "accession": "0001193125-07-051045",
+                "document": "d10k.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312507051045/d10k.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2006-11-17",
+                "accession": "0001193125-06-238445",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312506238445/d10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2006-08-18",
+                "accession": "0001193125-06-176211",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312506176211/d10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2006-05-19",
+                "accession": "0001193125-06-116421",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312506116421/d10q.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2006-03-15",
+                "accession": "0001193125-06-055150",
+                "document": "d10k.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312506055150/d10k.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2005-11-18",
+                "accession": "0001193125-05-229314",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312505229314/d10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2005-08-19",
+                "accession": "0001193125-05-171607",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312505171607/d10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2005-05-20",
+                "accession": "0001193125-05-111788",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312505111788/d10q.htm"
+            },
+            {
+                "type": "10-K",
+                "date": "2005-03-25",
+                "accession": "0001193125-05-061027",
+                "document": "d10k.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312505061027/d10k.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2004-11-22",
+                "accession": "0001193125-04-201626",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312504201626/d10q.htm"
+            },
+            {
+                "type": "10-Q",
+                "date": "2004-08-25",
+                "accession": "0001193125-04-146497",
+                "document": "d10q.htm",
+                "url": "https://www.sec.gov/Archives/edgar/data/1108524/000119312504146497/d10q.htm"
+            }
+        ]
     }
 ]

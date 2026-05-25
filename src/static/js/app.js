@@ -101,12 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
         quarterlyCfImg.style.display = 'none';
         loader.style.display = 'block';
         
-        // Add timestamp to prevent caching
-        const ts = new Date().getTime();
-        chartImg.src = `/api/annual_change_chart/${ticker}?t=${ts}`;
-        annualCfImg.src = `/api/annual_cashflow_chart/${ticker}?t=${ts}`;
-        quarterlyCfImg.src = `/api/quarterly_cashflow_chart/${ticker}?t=${ts}`;
-        
         // Handle image loading
         let loadedCount = 0;
         const totalImages = 3;
@@ -121,6 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
+        // Register event handlers BEFORE setting .src to prevent race conditions (especially with cached images)
         chartImg.onload = onImageLoad;
         annualCfImg.onload = onImageLoad;
         quarterlyCfImg.onload = onImageLoad;
@@ -133,6 +128,12 @@ document.addEventListener('DOMContentLoaded', () => {
         chartImg.onerror = onImageError;
         annualCfImg.onerror = onImageError;
         quarterlyCfImg.onerror = onImageError;
+
+        // Add timestamp to prevent caching and set .src to initiate loading
+        const ts = new Date().getTime();
+        chartImg.src = `/api/annual_change_chart/${ticker}?t=${ts}`;
+        annualCfImg.src = `/api/annual_cashflow_chart/${ticker}?t=${ts}`;
+        quarterlyCfImg.src = `/api/quarterly_cashflow_chart/${ticker}?t=${ts}`;
     }
 
     // Close modal logic
